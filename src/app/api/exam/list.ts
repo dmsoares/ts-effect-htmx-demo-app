@@ -4,5 +4,5 @@ import { Request, Response } from "express-serve-static-core";
 
 export const handler = (_: Request, res: Response) =>
   Effect.gen(function* () {
-    res.send(JSON.stringify(yield* ListExams.workflow));
+    return res.send(JSON.stringify(yield* ListExams.workflow));
   });

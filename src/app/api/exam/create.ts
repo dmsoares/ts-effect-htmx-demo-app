@@ -14,5 +14,5 @@ export const handler = (req: Request, res: Response) =>
 
     const outgoingExamDto = yield* CreateExam.workflow(body);
 
-    res.send(JSON.stringify(outgoingExamDto));
+    return res.send(JSON.stringify(outgoingExamDto));
   });
