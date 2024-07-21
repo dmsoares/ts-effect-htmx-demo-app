@@ -6,6 +6,8 @@ import {
   listExams,
   exams,
   examCreate,
+  updateExam,
+  examEdit,
 } from "./pages/exams/handlers";
 import { home } from "./pages/home/handler";
 
@@ -19,13 +21,21 @@ const enhance =
 
 const routes: Route[] = [
   // pages
-  ["get", "/", enhance(home)],
-  ["get", "/exams/list", enhance(exams)],
-  ["get", "/exams/detail/:id", enhance(examDetail)],
-  ["get", "/exams/create", enhance(examCreate)],
+  ["get", "/", home],
+  ["get", "/exams", exams],
+  ["get", "/exams/create", examCreate],
+  ["get", "/exams/:id", examDetail],
+  ["get", "/exams/:id/edit", examEdit],
   // partials
-  ["get", "/partials/exams", enhance(listExams)],
-  ["post", "/partials/exams/create", enhance(createExam)],
+  ["get", "/partials/exams", listExams],
+  ["post", "/partials/exams", createExam],
+  ["put", "/partials/exams/:id", updateExam],
 ];
 
-export default routes;
+const enhancedRoutes: Route[] = routes.map(([method, path, handler]) => [
+  method,
+  path,
+  enhance(handler),
+]);
+
+export default enhancedRoutes;

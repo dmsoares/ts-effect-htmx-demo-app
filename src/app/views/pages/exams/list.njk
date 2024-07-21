@@ -2,11 +2,13 @@
 
 {% block content %}
 
-<div class="flex justify-between items-center">
-    <h1 class="text-2xl font-bold mb-4">Exams</h1>
-    <a hx-get="/exams/create" hx-push-url="true" hx-target="#main" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">New</a>
-</div>
+	<div class="flex justify-between items-center">
+		<h1 class="text-2xl font-bold mb-4">Exams</h1>
+		<a hx-get="/exams/create" hx-push-url="true" hx-target="#main" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+			New
+		</a>
+	</div>
 
-{%- include('pages/exams/partials/exam-list.njk')%}
+	{%- include('pages/exams/partials/exam-list.njk')%}
 
 {% endblock %}

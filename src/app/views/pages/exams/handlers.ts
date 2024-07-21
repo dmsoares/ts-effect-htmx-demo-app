@@ -1,6 +1,11 @@
 import { Effect } from "effect";
 import { Handler } from "../../../types";
-import { CreateExam, GetExam, ListExams } from "../../../../core/workflows";
+import {
+  CreateExam,
+  GetExam,
+  ListExams,
+  UpdateExam,
+} from "../../../../core/workflows";
 
 // pages
 export const exams: Handler = (_, res) =>
@@ -20,6 +25,12 @@ export const examCreate: Handler = (_, res) =>
     return res.render("pages/exams/create.njk");
   });
 
+export const examEdit: Handler = (req, res) =>
+  Effect.gen(function* () {
+    res.locals.exam = yield* GetExam.workflow(req.params.id);
+    return res.render("pages/exams/edit.njk");
+  });
+
 // partials
 export const listExams: Handler = (_, res) =>
   Effect.gen(function* () {
@@ -30,5 +41,11 @@ export const listExams: Handler = (_, res) =>
 export const createExam: Handler = (req, res) =>
   Effect.gen(function* () {
     const exam = yield* CreateExam.workflow(req.body);
-    return res.redirect(`/exams/detail/${exam.id}`);
+    return res.redirect(`/exams/${exam.id}`);
+  });
+
+export const updateExam: Handler = (req, res) =>
+  Effect.gen(function* () {
+    const exam = yield* UpdateExam.workflow({ id: req.params.id, ...req.body });
+    return res.redirect(303, `/exams/${exam.id}`);
   });

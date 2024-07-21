@@ -4,7 +4,7 @@ import { Repository as ExamRepository } from "../../infrastructure/exam";
 import { IncomingExamDto, OutgoingExamDto, UnvalidatedExam } from "./types";
 
 const createUnvalidatedExam = (exam: IncomingExamDto): UnvalidatedExam => ({
-  id: ExamId.generate().id,
+  id: exam.id,
   name: exam.name,
 });
 

@@ -2,20 +2,13 @@
 
 {% block content %}
 
-<h1 class="text-2xl font-bold">Exam Detail</h1>
-<div>
-    <table class="table-auto">
-        <tbody>
-            <tr>
-                <td class="px-4 py-2 font-bold">Id:</td>
-                <td class="px-4 py-2">{{ exam.id }}</td>
-            </tr>
-            <tr>
-                <td class="px-4 py-2 font-bold">Name:</td>
-                <td class="px-4 py-2">{{ exam.name }}</td>
-            </tr>
-        </tbody>
-</div>
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold mb-4">Exam Detail</h1>
+        <a hx-get={{"/exams/" + exam.id + "/edit"}} hx-push-url="true" hx-target="#main" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded hover:cursor-pointer">Edit</a>
+    </div>
 
+    <div id="exam-detail-content">
+        {%- include('pages/exams/partials/exam-detail.njk') %}
+    </div>
 
 {% endblock %}

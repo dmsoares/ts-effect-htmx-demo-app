@@ -5,7 +5,7 @@ export type Handler = (
   req: Request,
   res: Response
 ) => Effect.Effect<unknown, Error>;
-export type Method = "get" | "post";
+export type Method = "get" | "post" | "put";
 export type Path = string;
 
 export type Route = [Method, Path, Handler];
