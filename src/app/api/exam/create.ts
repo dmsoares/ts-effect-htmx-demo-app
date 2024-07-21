@@ -1,8 +1,8 @@
 import { Effect } from "effect";
-import { CreateExam } from "../../core/workflows";
-import { MalformedDataError } from "../../core/domain";
+import { CreateExam } from "../../../core/workflows";
+import { MalformedDataError } from "../../../core/domain";
 import { Request, Response } from "express-serve-static-core";
-import { IncomingExamDto } from "../../core/workflows/create-exam";
+import { IncomingExamDto } from "../../../core/workflows/create-exam";
 
 export const handler = (req: Request, res: Response) =>
   Effect.gen(function* () {

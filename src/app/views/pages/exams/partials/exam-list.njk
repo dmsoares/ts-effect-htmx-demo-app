@@ -1,0 +1,22 @@
+<div id="exam-list" hx-get="/partials/exams" hx-trigger="exam-created from:body">
+    {% if exams | length > 0 %}
+    <ul>
+        {% for e in exams | list %}
+        <li>
+            <a
+                class="hover:cursor-pointer"
+                hx-get={{"/exams/detail/" + e.id}}
+                hx-push-url="true"
+                hx-target="#main">
+                <div class="hover:bg-gray-200 m-4">
+                    <div>{{ e.name }}</div>
+                    <div class="text-xs">{{ e.id }}</div>
+                </div>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No exams found</p>
+    {% endif %}
+</div>

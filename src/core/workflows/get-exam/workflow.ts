@@ -8,5 +8,7 @@ const createOutgoingExamDto = (exam: Exam.Exam): OutgoingExamDto => ({
   name: exam.name.name,
 });
 
-export const workflow = (id: ExamId.ExamId) =>
-  ExamRepository.getById(id).pipe(Effect.map(createOutgoingExamDto));
+export const workflow = (id: string) =>
+  ExamId.create(id)
+    .pipe(Effect.flatMap(ExamRepository.getById))
+    .pipe(Effect.map(createOutgoingExamDto));

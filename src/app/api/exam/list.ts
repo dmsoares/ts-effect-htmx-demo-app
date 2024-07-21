@@ -1,8 +1,8 @@
 import { Effect } from "effect";
-import pug from "pug";
+import { ListExams } from "../../../core/workflows";
 import { Request, Response } from "express-serve-static-core";
 
 export const handler = (_: Request, res: Response) =>
   Effect.gen(function* () {
-    res.send(pug.renderFile("src/api/views/index.pug"));
+    res.send(JSON.stringify(yield* ListExams.workflow));
   });

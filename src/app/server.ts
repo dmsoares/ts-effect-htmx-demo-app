@@ -1,25 +1,9 @@
 import { Context, Layer, Effect, Runtime } from "effect";
 import express from "express";
 import bodyParser from "body-parser";
-import { handler as createExam } from "./exam/create-exam";
-import { handler as listExams } from "./exam/list-exams";
-import { handler as getExam } from "./exam/get-exam";
-import { handler as home } from "./exam/home";
-
-import { Request, Response } from "express-serve-static-core";
-
-type Handler = (req: Request, res: Response) => Effect.Effect<unknown, Error>;
-type Method = "get" | "post";
-type Path = string;
-
-type Route = [Method, Path, Handler];
-
-const routes: Route[] = [
-  ["get", "/", home],
-  ["get", "/exams", listExams],
-  ["get", "/exams/:id", getExam],
-  ["post", "/exams", createExam],
-];
+import nunjucks from "nunjucks";
+import api from "./api/routes";
+import views from "./views/routes";
 
 // Define Express as a service
 class Express extends Context.Tag("Express")<
@@ -33,7 +17,18 @@ const IndexRouteLive = Layer.effectDiscard(
     const app = yield* Express;
     const runFork = Runtime.runFork(yield* Effect.runtime<never>());
 
-    routes.forEach(([method, path, handler]) => {
+    api.forEach(([method, path, handler]) => {
+      app[method](`/api${path}`, (req, res) => {
+        console.log(`Request: ${method.toUpperCase()} ${path}`);
+        runFork(
+          Effect.mapError(handler(req, res), (e) =>
+            res.status(500).send(e.message)
+          )
+        );
+      });
+    });
+
+    views.forEach(([method, path, handler]) => {
       app[method](path, (req, res) => {
         console.log(`Request: ${method.toUpperCase()} ${path}`);
         runFork(
@@ -51,6 +46,12 @@ const ServerLive = Layer.scopedDiscard(
   Effect.gen(function* () {
     const port = 3001;
     const app = yield* Express;
+
+    nunjucks.configure("src/app/views", {
+      autoescape: true,
+      express: app,
+    });
+
     yield* Effect.acquireRelease(
       Effect.sync(() =>
         app.listen(port, () =>
@@ -63,7 +64,11 @@ const ServerLive = Layer.scopedDiscard(
 );
 
 // Setting Up Express
-const ExpressLive = Layer.sync(Express, () => express().use(bodyParser.json()));
+const ExpressLive = Layer.sync(Express, () =>
+  express()
+    .use(bodyParser.json())
+    .use(bodyParser.urlencoded({ extended: true }))
+);
 
 // Combine the layers
 export const AppLive = ServerLive.pipe(
