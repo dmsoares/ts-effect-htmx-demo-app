@@ -4,5 +4,6 @@ import { GetExam } from "../../../core/workflows";
 
 export const handler = (req: Request, res: Response) =>
   Effect.gen(function* () {
-    return res.send(JSON.stringify(yield* GetExam.workflow(req.params.id)));
+    const { id, name } = yield* GetExam.workflow(req.params.id);
+    return res.send(JSON.stringify({ id: id.id, name: name.name }));
   });

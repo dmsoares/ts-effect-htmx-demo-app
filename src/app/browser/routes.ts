@@ -1,15 +1,15 @@
 import { Effect } from "effect";
 import { Handler, Route } from "../types";
+import { home } from "./views/pages/home/handler";
 import {
   createExam,
-  examDetail,
-  listExams,
-  exams,
   examCreate,
-  updateExam,
+  examDetail,
   examEdit,
-} from "./pages/exams/handlers";
-import { home } from "./pages/home/handler";
+  exams,
+  listExams,
+  updateExam,
+} from "./handlers/exams";
 
 const enhance =
   (handler: Handler): Handler =>

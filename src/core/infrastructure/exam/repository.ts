@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { deserialize, serialize } from "./serialization";
-import { Exam, ExamId, NotFoundError } from "../../domain";
+import { Exam, ExamId, ExamName, NotFoundError } from "../../domain";
 import { examsTable } from "./db-client";
 
 export const createOrUpdate = (exam: Exam.Exam) =>
@@ -39,4 +39,15 @@ export const getById = (id: ExamId.ExamId) =>
     return exam
       ? yield* deserialize(exam)
       : yield* Effect.fail(new NotFoundError("Exam not found"));
+  });
+
+export const getByName = (name: ExamName.ExamName) =>
+  Effect.gen(function* () {
+    const { read } = yield* examsTable;
+
+    const exams = yield* read;
+
+    return yield* Effect.all(
+      exams.filter((exam) => exam.name === name.name).map(deserialize)
+    );
   });

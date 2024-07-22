@@ -4,6 +4,10 @@ export class DomainError extends BaseError {
   readonly _tag = "DomainError";
 }
 
+export class WorkflowError extends BaseError {
+  readonly _tag = "WorkflowError";
+}
+
 export class ValidationError extends BaseError {
   readonly _tag = "ValidationError";
 }

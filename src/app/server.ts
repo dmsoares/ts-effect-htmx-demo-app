@@ -3,7 +3,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import nunjucks from "nunjucks";
 import api from "./api/routes";
-import views from "./views/routes";
+import browser from "./browser/routes";
+import { Route } from "./types";
 
 // Define Express as a service
 class Express extends Context.Tag("Express")<
@@ -17,27 +18,22 @@ const IndexRouteLive = Layer.effectDiscard(
     const app = yield* Express;
     const runFork = Runtime.runFork(yield* Effect.runtime<never>());
 
-    api.forEach(([method, path, handler]) => {
-      app[method](`/api${path}`, (req, res) => {
-        console.log(`Request: ${method.toUpperCase()} ${path}`);
-        runFork(
-          Effect.mapError(handler(req, res), (e) =>
-            res.status(500).send(e.message)
-          )
-        );
+    const setupRoutes = (routes: Route[], baseUrl: string | undefined = "") =>
+      routes.forEach(([method, path, handler]) => {
+        app[method](`${baseUrl}${path}`, (req, res) => {
+          runFork(
+            Effect.gen(function* () {
+              yield* Effect.log(`Request: ${method.toUpperCase()} ${path}`);
+              return yield* Effect.mapError(handler(req, res), (e) =>
+                res.status(500).send(JSON.stringify({ error: e.message }))
+              );
+            })
+          );
+        });
       });
-    });
 
-    views.forEach(([method, path, handler]) => {
-      app[method](path, (req, res) => {
-        console.log(`Request: ${method.toUpperCase()} ${path}`);
-        runFork(
-          Effect.mapError(handler(req, res), (e) =>
-            res.status(500).send(e.message)
-          )
-        );
-      });
-    });
+    setupRoutes(browser);
+    setupRoutes(api, "/api");
   })
 );
 
@@ -47,7 +43,7 @@ const ServerLive = Layer.scopedDiscard(
     const port = 3001;
     const app = yield* Express;
 
-    nunjucks.configure("src/app/views", {
+    nunjucks.configure("src/app/browser/views", {
       autoescape: true,
       express: app,
     });

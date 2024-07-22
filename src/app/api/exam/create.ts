@@ -1,18 +1,20 @@
 import { Effect } from "effect";
 import { CreateExam } from "../../../core/workflows";
-import { MalformedDataError } from "../../../core/domain";
 import { Request, Response } from "express-serve-static-core";
-import { IncomingExamDto } from "../../../core/workflows/create-exam";
+import { z } from "zod";
+import { validateBody } from "../validators";
+
+const zIncomingExamDto = z.object({
+  name: z.string(),
+});
 
 export const handler = (req: Request, res: Response) =>
   Effect.gen(function* () {
-    const body = req.body as IncomingExamDto;
+    const incomingExamDto = yield* validateBody(zIncomingExamDto, req.body);
 
-    if (!CreateExam.zIncomingExamDto.safeParse(body).success) {
-      yield* Effect.fail(new MalformedDataError("Malformed body"));
-    }
+    const { id, name } = yield* CreateExam.workflow({
+      name: incomingExamDto.name,
+    });
 
-    const outgoingExamDto = yield* CreateExam.workflow(body);
-
-    return res.send(JSON.stringify(outgoingExamDto));
+    return res.send(JSON.stringify({ id: id.id, name: name.name }));
   });
