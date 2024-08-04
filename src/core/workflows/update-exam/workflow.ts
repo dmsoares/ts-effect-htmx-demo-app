@@ -1,22 +1,35 @@
-import { Effect as E } from "effect";
+import { Context, Effect, Layer } from "effect";
+import { UnknownException } from "effect/Cause";
 import { Exam, ExamId, ExamName } from "../../domain/exam";
-import { Repository as ExamRepository } from "../../infrastructure/exam";
-import { IncomingExamDto, UnvalidatedExam } from "./types";
+import { UnvalidatedExam } from "./types";
 import { canCreateOrUpdate } from "../../services/exam/can-create-or-update";
+import { ValidationError, WorkflowError } from "../../domain";
+import { ExamRepository } from "../../infrastructure/exam/repository";
+
+type Error = ValidationError | WorkflowError | UnknownException;
+
+export class UpdateExamWorkflow extends Context.Tag("CreateExamWorkflow")<
+  UpdateExamWorkflow,
+  (exam: UnvalidatedExam) => Effect.Effect<Exam.Exam, Error, ExamRepository>
+>() {}
 
 const validateExam = (exam: UnvalidatedExam) =>
-  E.gen(function* () {
+  Effect.gen(function* () {
     return Exam.create(
       yield* ExamId.create(exam.id),
       yield* ExamName.create(exam.name)
     );
   });
 
-const saveExam = ExamRepository.createOrUpdate;
+const saveExam = (exam: Exam.Exam) =>
+  ExamRepository.pipe(Effect.flatMap((repo) => repo.createOrUpdate(exam)));
 
-export const workflow = (exam: IncomingExamDto) =>
-  E.succeed(exam).pipe(
-    E.flatMap(validateExam),
-    E.flatMap(canCreateOrUpdate),
-    E.flatMap(saveExam)
-  );
+export const WorkflowLive = Layer.succeed(
+  UpdateExamWorkflow,
+  (exam: UnvalidatedExam) =>
+    Effect.succeed(exam).pipe(
+      Effect.flatMap(validateExam),
+      Effect.flatMap(canCreateOrUpdate),
+      Effect.flatMap(saveExam)
+    )
+);

@@ -1,46 +1,56 @@
 import { Effect } from "effect";
-import { Handler } from "../../types";
-import Exams from "../workflows/exams";
+import { Request, Response } from "../../types";
+import { withHtmx } from "./with-htmx";
+import { BrowserWorkflows } from "../workflows/exams";
 
-// pages
-export const exams: Handler = (_, res) =>
+export const exams = withHtmx((_: Request, res: Response) =>
   Effect.gen(function* () {
-    const exams = yield* Exams.listExams;
+    const exams = yield* (yield* BrowserWorkflows).listExams;
     return res.render("pages/exams/list.njk", { exams });
-  });
+  })
+);
 
-export const examDetail: Handler = (req, res) =>
+export const examDetail = withHtmx((req: Request, res: Response) =>
   Effect.gen(function* () {
-    const exam = yield* Exams.getExam(req.params.id);
+    const exam = yield* (yield* BrowserWorkflows).getExam(req.params.id);
     return res.render("pages/exams/detail.njk", { exam });
-  });
+  })
+);
 
-export const examCreate: Handler = (_, res) =>
+export const examCreate = withHtmx((_: Request, res: Response) =>
   Effect.gen(function* () {
     return res.render("pages/exams/create.njk");
-  });
+  })
+);
 
-export const examEdit: Handler = (req, res) =>
+export const examEdit = withHtmx((req: Request, res: Response) =>
   Effect.gen(function* () {
-    const exam = yield* Exams.getExam(req.params.id);
+    const exam = yield* (yield* BrowserWorkflows).getExam(req.params.id);
     return res.render("pages/exams/edit.njk", { exam });
-  });
+  })
+);
 
 // partials
-export const listExams: Handler = (_, res) =>
+export const listExams = withHtmx((_: Request, res: Response) =>
   Effect.gen(function* () {
-    const exams = Exams.listExams;
+    const exams = yield* (yield* BrowserWorkflows).listExams;
     return res.render("pages/exams/exam-list.njk", { exams });
-  });
+  })
+);
 
-export const createExam: Handler = (req, res) =>
+export const createExam = withHtmx((req: Request, res: Response) =>
   Effect.gen(function* () {
-    const exam = yield* Exams.createExam(req.body);
+    const exam = yield* (yield* BrowserWorkflows).createExam(req.body);
     return res.redirect(`/exams/${exam.id}`);
-  });
+  })
+);
 
-export const updateExam: Handler = (req, res) =>
+export const updateExam = withHtmx((req: Request, res: Response) =>
   Effect.gen(function* () {
-    const exam = yield* Exams.updateExam({ id: req.params.id, ...req.body });
+    const exam = yield* (yield* BrowserWorkflows).updateExam({
+      id: req.params.id,
+      ...req.body,
+    });
     return res.redirect(303, `/exams/${exam.id}`);
-  });
+  })
+);

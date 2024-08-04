@@ -1,7 +1,9 @@
 import { Effect } from "effect";
-import { Handler } from "../../types";
+import { Request, Response } from "../../types";
+import { withHtmx } from "./with-htmx";
 
-export const home: Handler = (_, res) =>
+export const home = withHtmx((_: Request, res: Response) =>
   Effect.gen(function* () {
     return res.render("pages/home/home.njk");
-  });
+  })
+);

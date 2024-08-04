@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Context, Effect, Layer } from "effect";
 import { deserialize, serialize } from "./serialization";
 import { Exam, ExamId, ExamName, NotFoundError } from "../../domain";
 import { examsTable } from "./db-client";
@@ -21,14 +21,13 @@ export const createOrUpdate = (exam: Exam.Exam) =>
     return exam;
   });
 
-export const getAll = () =>
-  Effect.gen(function* () {
-    const { read } = yield* examsTable;
+export const getAll = Effect.gen(function* () {
+  const { read } = yield* examsTable;
 
-    const exams = yield* read;
+  const exams = yield* read;
 
-    return yield* Effect.all(exams.map((exam) => deserialize(exam)));
-  });
+  return yield* Effect.all(exams.map((exam) => deserialize(exam)));
+});
 
 export const getById = (id: ExamId.ExamId) =>
   Effect.gen(function* () {
@@ -51,3 +50,17 @@ export const getByName = (name: ExamName.ExamName) =>
       exams.filter((exam) => exam.name === name.name).map(deserialize)
     );
   });
+
+const repository = {
+  createOrUpdate,
+  getAll,
+  getById,
+  getByName,
+};
+
+export class ExamRepository extends Context.Tag("ExamRepository")<
+  ExamRepository,
+  typeof repository
+>() {
+  static readonly Live = Layer.succeed(this, repository);
+}
