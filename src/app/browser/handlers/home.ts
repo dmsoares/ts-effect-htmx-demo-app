@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Handler } from "../../../../types";
+import { Handler } from "../../types";
 
 export const home: Handler = (_, res) =>
   Effect.gen(function* () {

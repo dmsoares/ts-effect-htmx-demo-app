@@ -1,6 +1,6 @@
 import { Effect } from "effect";
-import { ListExams } from "../../../core/workflows";
 import { Request, Response } from "express-serve-static-core";
+import { ListExams } from "../../../../core/workflows";
 
 export const handler = (_: Request, res: Response) =>
   Effect.gen(function* () {
