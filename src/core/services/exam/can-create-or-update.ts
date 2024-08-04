@@ -8,7 +8,7 @@ export const canCreateOrUpdate = (exam: Exam.Exam) =>
     // but let's imagine it's a business rule that can eventually change
     const sameNameExams = yield* ExamRepository.getByName(exam.name);
 
-    if (sameNameExams.find((e) => e.id !== exam.id)) {
+    if (sameNameExams.find((e) => e.id.id !== exam.id.id)) {
       return yield* Effect.fail(
         new WorkflowError("Exam with the same name already exists")
       );
