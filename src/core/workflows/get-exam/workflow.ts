@@ -10,6 +10,10 @@ export class GetExamWorkflow extends Context.Tag("GetExamWorkflow")<
   (id: string) => Effect.Effect<Exam.Exam, WorkflowError>
 >() {}
 
-export const WorkflowLive = Layer.succeed(GetExamWorkflow, (id: string) =>
-  ExamId.create(id).pipe(Effect.flatMap(ExamRepository.getById))
+export const WorkflowLive = Layer.effect(
+  GetExamWorkflow,
+  Effect.gen(function* () {
+    const repo = yield* ExamRepository.ExamRepository;
+    return (id: string) => ExamId.create(id).pipe(Effect.flatMap(repo.getById));
+  })
 );

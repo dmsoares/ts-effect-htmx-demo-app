@@ -1,5 +1,5 @@
 import * as fs from "node:fs/promises";
-import { Effect } from "effect";
+import { Context, Effect, Layer } from "effect";
 import { SerializedExam } from "./serialization";
 
 const initTable = (table: string) =>
@@ -25,7 +25,7 @@ const initTable = (table: string) =>
     };
   });
 
-export const examsTable = Effect.gen(function* () {
+const examsTable = Effect.gen(function* () {
   const table = "exams";
 
   const { write, read: readRaw } = yield* initTable(table);
@@ -35,3 +35,13 @@ export const examsTable = Effect.gen(function* () {
     read: readRaw as Effect.Effect<SerializedExam[]>,
   };
 });
+
+export class ExamsTableService extends Context.Tag("ExamsTableService")<
+  ExamsTableService,
+  Effect.Effect.Success<typeof examsTable>
+>() {}
+
+export const ExamsTableServiceLive = Layer.effect(
+  ExamsTableService,
+  examsTable
+);
