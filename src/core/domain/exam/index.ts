@@ -1,5 +1,5 @@
 import * as ExamId from "./exam-identifier";
-import * as ExamName from "./exam-name";
 import * as Exam from "./exam";
+export * from "./exam-name";
 
-export { Exam, ExamId, ExamName };
+export { Exam, ExamId };

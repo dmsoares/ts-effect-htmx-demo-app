@@ -37,7 +37,7 @@ const make = Effect.gen(function* () {
         : yield* Effect.fail(new NotFoundError("Exam not found"));
     });
 
-  const getByName = (name: ExamName.ExamName) =>
+  const getByName = (name: ExamName) =>
     Effect.gen(function* () {
       const exams = yield* read;
 
